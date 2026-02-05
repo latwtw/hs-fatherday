@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>正在前往表單...</title>
+    <script>
+        // 設定你的網址清單
+        const urls = [
+            "https://forms.gle/iRgUYcLM6mFM4AQ8A",
+            "https://forms.gle/bZCScqwkqQN68f4a8",
+            "https://forms.gle/D3FhAUyD9MkuRmE39"
+        ];
+
+        // 隨機演算法：從 0 到 2 之間選一個數字
+        const randomIndex = Math.floor(Math.random() * urls.length);
+        
+        // 執行跳轉
+        window.location.replace(urls[randomIndex]);
+    </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
+    <p>正在隨機為您跳轉至表單，請稍候...</p>
+</body>
+</html>
