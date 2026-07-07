@@ -2,23 +2,869 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>正在前往表單...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>測出最適合你的浴室設計：找尋專屬你的衛浴美學風格｜HouseStyle 好時代衛浴</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js for 3D simulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
     <script>
-        // 設定你的網址清單
-        const urls = [
-            "https://forms.gle/L2HCAmq9E13canf28",
-            "https://forms.gle/VjWMLYGLzqo4iHdm8",
-            "https://forms.gle/8sLeXNtQgTsGsNe59"
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlue: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            200: '#bae0fd',
+                            300: '#7cc7fb',
+                            400: '#38abf8',
+                            500: '#0e90e9',
+                            600: '#0072c6', /* HouseStyle brand primary */
+                            700: '#025ba2',
+                            800: '#064e86',
+                            900: '#0b416f',
+                            950: '#07294a'
+                        },
+                        neutralWhite: '#fcfdfe',
+                        premiumGray: '#f1f5f9'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            overflow-x: hidden;
+            background-color: #f0f7ff;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f0f7ff;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #bae0fd;
+            border-radius: 3px;
+        }
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 114, 198, 0.08);
+        }
+        .btn-glow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 20px rgba(0, 114, 198, 0.4);
+            transform: translateY(-2px);
+        }
+        /* Page animation states */
+        .show-page {
+            opacity: 1;
+            transform: scale(1);
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+            position: relative;
+            z-index: 10;
+            display: block !important;
+        }
+        .hide-page {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            z-index: 0;
+            display: none !important;
+        }
+        /* 3D Canvas Background fixed full */
+        #webgl-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="text-slate-900 min-h-screen flex flex-col justify-between select-none">
+
+    <!-- 3D Canvas fixed background -->
+    <div id="webgl-container"></div>
+
+    <!-- Crisp White Glassmorphism Header with premium contrast -->
+    <header class="w-full py-4 px-6 md:px-12 flex justify-between items-center z-20 relative bg-white/90 backdrop-blur-md border-b border-brandBlue-100/80 shadow-sm">
+        <div class="flex items-center space-x-2">
+            <!-- Premium capsule container to seamlessly blend the logo JPG onto a light header background -->
+            <div id="logo-badge-container" class="bg-black py-1.5 px-4 rounded-full border border-slate-100 shadow-sm transition-transform duration-300 hover:scale-[1.02]" style="display: none;">
+                <!-- HouseStyle Official Logo Image -->
+                <img id="logo-img" src="圖片8.jpg" alt="HouseStyle 好時代衛浴" class="h-8 md:h-10 w-auto object-contain block" onerror="handleLogoError()">
+            </div>
+            
+            <!-- Text Fallback in case of environment blockages (Outside badge for pure contrast) -->
+            <div id="logo-fallback" class="items-center space-x-2 flex">
+                <span class="text-brandBlue-600 font-black text-xl md:text-2xl tracking-wider">HouseStyle</span>
+                <span class="text-slate-500 font-medium text-xs md:text-sm border-l border-slate-300 pl-2">好時代衛浴</span>
+            </div>
+        </div>
+        <div class="text-xs md:text-sm font-bold tracking-widest text-brandBlue-700 bg-brandBlue-50 px-4 py-2 rounded-full border border-brandBlue-200 shadow-sm">
+            父親節美學企劃
+        </div>
+    </header>
+
+    <main class="flex-grow flex items-center justify-center px-4 py-8 md:py-12 z-10 relative">
+        <div class="w-full max-w-4xl">
+
+            <!-- 1. INTRO SCREEN -->
+            <div id="intro-screen" class="show-page">
+                <div class="glass-panel p-8 md:p-12 rounded-3xl text-center max-w-2xl mx-auto border border-white/80">
+                    <div class="w-16 h-16 bg-brandBlue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fa-solid fa-bath text-brandBlue-600 text-2xl"></i>
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-bold text-slate-950 mb-4 tracking-wide leading-tight">
+                        測出最適合你的浴室設計
+                    </h1>
+                    <p class="text-brandBlue-600 text-sm md:text-md tracking-widest font-semibold uppercase mb-6">
+                        找尋專屬你的衛浴美學風格
+                    </p>
+                    <p class="text-slate-600 text-base md:text-lg mb-8 leading-relaxed">
+                        家是卸下武裝的城堡，而浴室是唯一的絕對私密聖地。<br>
+                        只需兩分鐘，探索你在洗沐時光中最真實的靈魂偏好，<br>
+                        解鎖最契合你日常的衛浴設計，並獲取父親節限定豪禮！
+                    </p>
+                    <button onclick="startQuiz()" class="btn-glow w-full sm:w-auto bg-brandBlue-600 hover:bg-brandBlue-700 text-white font-semibold text-lg py-4 px-10 rounded-full inline-flex items-center justify-center space-x-3 shadow-lg">
+                        <span>開啟衛浴空間之旅</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. QUIZ SCREEN -->
+            <div id="quiz-screen" class="hide-page">
+                <div class="glass-panel p-6 md:p-10 rounded-3xl w-full max-w-2xl mx-auto border border-white/80 relative">
+                    <!-- Progress meter -->
+                    <div class="flex justify-between items-center mb-6">
+                        <span id="quiz-step-text" class="text-xs font-bold tracking-widest text-brandBlue-600 uppercase">QUESTION 01</span>
+                        <span id="quiz-progress-text" class="text-xs font-bold text-slate-500">1 / 5</span>
+                    </div>
+                    <div class="w-full bg-brandBlue-100 h-1.5 rounded-full overflow-hidden mb-8">
+                        <div id="progress-bar" class="bg-brandBlue-600 h-full w-1/5 transition-all duration-300"></div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-950 mb-8 leading-snug">載入中...</h2>
+
+                    <!-- Options Container -->
+                    <div class="space-y-4">
+                        <button onclick="selectOption('A')" class="w-full text-left p-4 rounded-2xl bg-white/70 hover:bg-brandBlue-50 border border-slate-200 hover:border-brandBlue-400 text-slate-800 font-medium text-md flex items-center space-x-4 transition-all duration-200">
+                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold flex items-center justify-center border border-slate-200">A</span>
+                            <span id="opt-text-A">選項載入中...</span>
+                        </button>
+                        <button onclick="selectOption('B')" class="w-full text-left p-4 rounded-2xl bg-white/70 hover:bg-brandBlue-50 border border-slate-200 hover:border-brandBlue-400 text-slate-800 font-medium text-md flex items-center space-x-4 transition-all duration-200">
+                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold flex items-center justify-center border border-slate-200">B</span>
+                            <span id="opt-text-B">選項載入中...</span>
+                        </button>
+                        <button onclick="selectOption('C')" class="w-full text-left p-4 rounded-2xl bg-white/70 hover:bg-brandBlue-50 border border-slate-200 hover:border-brandBlue-400 text-slate-800 font-medium text-md flex items-center space-x-4 transition-all duration-200">
+                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold flex items-center justify-center border border-slate-200">C</span>
+                            <span id="opt-text-C">選項載入中...</span>
+                        </button>
+                        <button onclick="selectOption('D')" class="w-full text-left p-4 rounded-2xl bg-white/70 hover:bg-brandBlue-50 border border-slate-200 hover:border-brandBlue-400 text-slate-800 font-medium text-md flex items-center space-x-4 transition-all duration-200">
+                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold flex items-center justify-center border border-slate-200">D</span>
+                            <span id="opt-text-D">選項載入中...</span>
+                        </button>
+                        <button onclick="selectOption('E')" class="w-full text-left p-4 rounded-2xl bg-white/70 hover:bg-brandBlue-50 border border-slate-200 hover:border-brandBlue-400 text-slate-800 font-medium text-md flex items-center space-x-4 transition-all duration-200">
+                            <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 text-slate-600 text-sm font-bold flex items-center justify-center border border-slate-200">E</span>
+                            <span id="opt-text-E">選項載入中...</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RESULT SCREEN -->
+            <div id="result-screen" class="hide-page">
+                <div class="glass-panel p-6 md:p-10 rounded-3xl w-full max-w-3xl mx-auto border border-white/80">
+                    <div class="text-center mb-6">
+                        <span class="text-xs font-black tracking-widest text-brandBlue-600 uppercase bg-brandBlue-100 px-4 py-1.5 rounded-full">YOUR STYLE RESULT</span>
+                        <h2 class="text-2xl md:text-3xl font-bold text-slate-950 mt-4">專屬你的浴室美學風格</h2>
+                    </div>
+
+                    <!-- Split layout: Image & Result Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mb-8">
+                        <!-- Dynamic Style Image (Optimized & Cleansed of messy sub-elements) -->
+                        <div class="md:col-span-5 relative group overflow-hidden rounded-2xl shadow-md bg-slate-100 aspect-[4/3] md:aspect-square flex items-center justify-center">
+                            <img id="style-image" src="" alt="風格照片" class="w-full h-full object-cover transition-all duration-500 hover:scale-105" style="opacity: 0;">
+                            <!-- Elegant Linear Gradient Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
+                        </div>
+
+                        <!-- Style details -->
+                        <div class="md:col-span-7 space-y-4">
+                            <h3 id="result-style-title" class="text-2xl md:text-3xl font-extrabold text-brandBlue-600 flex items-center gap-2">飯店精品風 ⭐</h3>
+                            <p id="result-style-desc" class="text-slate-700 text-base leading-relaxed">...</p>
+                            
+                            <div class="bg-brandBlue-50 border border-brandBlue-100 p-4 rounded-xl">
+                                <span class="text-xs font-bold text-brandBlue-700 block mb-1 tracking-wider uppercase">適合配置與材質：</span>
+                                <p id="result-style-materials" class="text-slate-800 font-medium text-sm">...</p>
+                            </div>
+
+                            <!-- Link to Case Study placed directly beneath the Materials panel -->
+                            <div class="pt-1 text-left">
+                                <a id="result-case-link" href="#" target="_blank" class="inline-flex items-center space-x-2 text-brandBlue-600 hover:text-brandBlue-800 font-extrabold text-sm border-b border-dashed border-brandBlue-600 pb-0.5 transition-colors duration-200">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                    <span id="result-case-title">...</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Promotion box -->
+                    <div class="bg-gradient-to-r from-brandBlue-600 to-brandBlue-800 text-white rounded-2xl p-6 mb-8 shadow-md">
+                        <h4 class="text-lg font-bold mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-ribbon text-yellow-300"></i> 好時代 8 月份父親節特別獻禮
+                        </h4>
+                        <p id="result-promo-offer" class="text-sm text-brandBlue-50 leading-relaxed mb-4"><i class="fa-solid fa-gift mr-2"></i> ...</p>
+                        
+                        <!-- Coupon field -->
+                        <div class="bg-white/10 backdrop-blur-md rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 border border-white/20">
+                            <div>
+                                <span class="text-xs text-brandBlue-200 block">風格專屬優惠代碼</span>
+                                <span id="style-code" class="text-xl font-bold tracking-widest text-white">...</span>
+                            </div>
+                            <button onclick="copyStyleCode()" class="bg-white hover:bg-brandBlue-100 text-brandBlue-700 px-5 py-2.5 rounded-lg text-sm font-bold flex items-center space-x-2 transition-colors duration-200 shadow">
+                                <i id="copy-icon" class="fa-regular fa-copy"></i>
+                                <span>複製代碼</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons (Split 3 ways for local LINE@ redirects) -->
+                    <div class="space-y-4">
+                        <div class="text-center">
+                            <span class="text-xs font-bold tracking-wider text-slate-500 uppercase block mb-2">✦ 點擊下方門市加入LINE官方帳號 ✦</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <button onclick="handleLineRedirect('taipei')" class="w-full py-3.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b04b] text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition-all duration-200 shadow-md hover:scale-[1.02]">
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fa-brands fa-line text-lg"></i>
+                                    <span class="text-sm">台北門市 預約</span>
+                                </div>
+                            </button>
+                            <button onclick="handleLineRedirect('taoyuan')" class="w-full py-3.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b04b] text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition-all duration-200 shadow-md hover:scale-[1.02]">
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fa-brands fa-line text-lg"></i>
+                                    <span class="text-sm">桃園門市 預約</span>
+                                </div>
+                            </button>
+                            <button onclick="handleLineRedirect('hsinchu')" class="w-full py-3.5 px-4 rounded-xl bg-[#06C755] hover:bg-[#05b04b] text-white font-bold text-xs flex flex-col items-center justify-center space-y-1 transition-all duration-200 shadow-md hover:scale-[1.02]">
+                                <div class="flex items-center space-x-1.5">
+                                    <i class="fa-brands fa-line text-lg"></i>
+                                    <span class="text-sm">新竹門市 預約</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Restart button -->
+                    <div class="mt-8 text-center border-t border-slate-100 pt-6">
+                        <button onclick="restartQuiz()" class="text-slate-500 hover:text-brandBlue-600 font-bold text-sm transition-colors duration-200">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> 重新測驗
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Global Floating Feedback Toast -->
+    <div id="toast-message" class="fixed top-8 left-1/2 -translate-x-1/2 z-50 glass-panel border-brandBlue-200 py-3.5 px-6 rounded-full text-brandBlue-700 font-semibold text-sm flex items-center space-x-2 shadow-xl opacity-0 translate-y-0 transition-all duration-300 pointer-events-none">
+        <i class="fa-solid fa-check text-brandBlue-600"></i>
+        <span>優惠代碼已成功複製！</span>
+    </div>
+
+    <!-- Footer copyright info -->
+    <footer class="w-full py-4 text-center text-xs text-slate-500 border-t border-brandBlue-100 bg-white/40 z-10 relative">
+        © 2026 HouseStyle 好時代衛浴 版權所有. 到府丈量與浴室櫃體訂製服務.
+    </footer>
+
+    <script>
+        // --- 5-QUESTION MULTIPLE CHOICE DATA ---
+        const quizData = [
+            {
+                id: 1,
+                question: "如果今天終於放假，你最想怎麼度過？",
+                options: {
+                    A: { text: "到山上、森林或咖啡廳放空", style: 'B' }, // Nordic
+                    B: { text: "約朋友吃早午餐、拍美照", style: 'D' }, // Creamy
+                    C: { text: "去五星級飯店住一晚", style: 'A' },     // Hotel
+                    D: { text: "在家泡茶、看書、放空", style: 'E' },     // Muji
+                    E: { text: "把家裡整理得乾乾淨淨", style: 'C' }     // Modern
+                }
+            },
+            {
+                id: 2,
+                question: "你最不能接受浴室出現什麼情況？",
+                options: {
+                    A: { text: "東西亂放、收納不足", style: 'C' },     // Modern
+                    B: { text: "看起來沒有質感", style: 'A' },         // Hotel
+                    C: { text: "空間讓人覺得壓迫、吵雜", style: 'E' },     // Muji
+                    D: { text: "光線昏暗、沒有溫度", style: 'B' },     // Nordic
+                    E: { text: "配色不好看、不夠有設計感", style: 'D' } // Creamy
+                }
+            },
+            {
+                id: 3,
+                question: "如果重新裝潢浴室，你最想投資哪一項？",
+                options: {
+                    A: { text: "簡約耐看的整體空間", style: 'E' },     // Muji
+                    B: { text: "收納設計與乾濕分離", style: 'C' },     // Modern
+                    C: { text: "漂亮的磁磚與造型五金", style: 'D' }, // Creamy
+                    D: { text: "飯店等級設備", style: 'A' },         // Hotel
+                    E: { text: "木質浴櫃與舒服燈光", style: 'B' }     // Nordic
+                }
+            },
+            {
+                id: 4,
+                question: "你希望每天走進浴室的第一個感受是？",
+                options: {
+                    A: { text: "很漂亮，很有品味。", style: 'D' },     // Creamy
+                    B: { text: "很安靜，很療癒。", style: 'E' },         // Muji
+                    C: { text: "很舒服，很放鬆。", style: 'B' },         // Nordic
+                    D: { text: "很乾淨，很俐落。", style: 'C' },         // Modern
+                    E: { text: "哇，好像精品飯店。", style: 'A' }         // Hotel
+                }
+            },
+            {
+                id: 5,
+                question: "看到下面哪一句最符合你的生活態度？",
+                options: {
+                    A: { text: "簡單有效率，就是最好的設計。", style: 'C' }, // Modern
+                    B: { text: "生活要有質感，才能享受人生。", style: 'A' }, // Hotel
+                    C: { text: "少一點、多剛好。", style: 'E' },         // Muji
+                    D: { text: "美感就是生活的一部分。", style: 'D' },     // Creamy
+                    E: { text: "舒服，比什麼都重要。", style: 'B' }         // Nordic
+                }
+            }
         ];
 
-        // 隨機演算法：從 0 到 2 之間選一個數字
-        const randomIndex = Math.floor(Math.random() * urls.length);
-        
-        // 執行跳轉
-        window.location.replace(urls[randomIndex]);
+        // Style mapping containing real case study links and dynamic image URLs
+        const styleMetadata = {
+            'A': {
+                title: "飯店精品風 ⭐",
+                desc: "你喜歡有質感、有層次的生活，重視空間帶來的享受感，適合打造五星級飯店般的衛浴。在低調而奢華的色調下，品味專屬的極致洗沐時光。",
+                materials: "石紋磁磚、大面鏡櫃、低調奢華設備。",
+                promo: "憑此畫面預約好時代門市諮詢，可享父親節特別豪禮！",
+                code: "HS-DAD88-HOTEL",
+                image: "https://i.meee.com.tw/v8yOwPU.png",
+                fallbackImage: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=800&auto=format&fit=crop",
+                caseTitle: "土城-高質感飯店等級浴室",
+                caseUrl: "https://housestyle.com.tw/case/%e5%9c%9f%e5%9f%8e-%e9%ab%98%e8%b3%aa%e6%84%9f%e9%a3%af%e5%ba%97%e7%ad%89%e7%b4%9a%e6%b5%b4%e5%ae%a4/"
+            },
+            'B': {
+                title: "北歐自然風 🌿",
+                desc: "你追求舒適與放鬆，喜歡自然元素與溫暖色調，打造療癒感衛浴最適合你。大量的留白與溫馨的大地色系，一洗整天的喧囂與壓力。",
+                materials: "木紋浴櫃、淺色磁磚、植物配件、低飽和色系。",
+                promo: "憑此畫面預約好時代門市諮詢，可享父親節特別豪禮！",
+                code: "HS-DAD88-NORDIC",
+                image: "https://i.meee.com.tw/1cDxhVm.png",
+                fallbackImage: "https://images.unsplash.com/photo-1620626011761-996317b6979a?q=80&w=800&auto=format&fit=crop",
+                caseTitle: "台北松山 一家四口的新起點",
+                caseUrl: "https://housestyle.com.tw/case/%e6%9d%be%e5%b1%b1-%e9%83%bd%e6%9c%8b%e5%a4%a7%e6%a8%93-%e4%b8%80%e5%ae%b6%e5%9b%9b%e5%8f%a3%e7%9a%84%e6%96%b0%e8%b5%b7%e9%bb%9e/"
+            },
+            'C': {
+                title: "現代極簡風 📐",
+                desc: "你重視機能與收納，喜歡乾淨俐落的空間，實用與美感兼具才是你的理想衛浴。利用隱藏式收納與俐落線條，創造無雜訊的絕對領域。",
+                materials: "隱藏式浴櫃、灰白色系搭配、簡單俐落搭配設計。",
+                promo: "憑此畫面預約好時代門市諮詢，可享父親節特別豪禮！",
+                code: "HS-DAD88-MODERN",
+                image: "https://i.meee.com.tw/AH1bE6J.png",
+                fallbackImage: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?q=80&w=800&auto=format&fit=crop",
+                caseTitle: "逆轉新風貌｜成功國宅華麗大改造2.0",
+                caseUrl: "https://housestyle.com.tw/case/%e9%80%86%e8%bd%89%e6%96%b0%e9%a2%a8%e8%b2%8c%ef%bd%9c%e6%88%90%e5%8a%9f%e5%9c%8b%e5%ae%85%e8%8f%af%e9%ba%97%e5%a4%a7%e6%94%b9%e9%80%a02-0/"
+            },
+            'D': {
+                title: "奶油輕奢風 🍦",
+                desc: "你喜歡柔和、有設計感的生活氛圍，希望每天都能在漂亮的空間中開始與結束一天。精緻的金邊與溫柔的弧形造型，點亮極致美學生活。",
+                materials: "暖色系烤漆、金屬邊框掛鏡、極致美學設計。",
+                promo: "憑此畫面預約好時代門市諮詢，可享父親節特別豪禮！",
+                code: "HS-DAD88-CREAMY",
+                image: "https://i.meee.com.tw/7TDCXTP.png",
+                fallbackImage: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?q=80&w=800&auto=format&fit=crop",
+                caseTitle: "本直設計 天廈 極品奶茶色調浴室",
+                caseUrl: "https://housestyle.com.tw/case/%e6%9c%ac%e7%9b%b4%e8%a8%ad%e8%a8%88-%e5%a4%a9%e5%bb%88-%e6%a5%b5%e5%93%81%e5%a5%b6%e8%8c%b6%e8%89%b2%e8%aa%bf%e6%b5%b4%e5%ae%a4/"
+            },
+            'E': {
+                title: "日式無印風 🍵",
+                desc: "你偏好簡單、安靜、耐看的設計，重視留白與自然材質，讓浴室成為最放鬆的角落。不盲從奢華，更偏好與內心平靜的誠摯對話。",
+                materials: "木紋色櫃體、簡約收納方式、百看不厭的設計。",
+                promo: "憑此畫面預約好時代門市諮詢，可享父親節特別豪禮！",
+                code: "HS-DAD88-MUJI",
+                image: "https://i.meee.com.tw/3ujleTQ.png",
+                fallbackImage: "https://images.unsplash.com/photo-1507652313519-d4e9174996dd?q=80&w=800&auto=format&fit=crop",
+                caseTitle: "思源設計 無印風的理想浴室設計",
+                caseUrl: "https://housestyle.com.tw/case/%e6%80%9d%e6%ba%90%e8%a8%ad%e8%a8%88-%e7%84%a1%e5%8d%b0%e9%a2%a8%e7%9a%84%e7%90%86%e6%83%b3%e6%b5%b4%e5%ae%a4%e8%a8%ad%e8%a8%88/"
+            }
+        };
+
+        const LINE_LINKS = {
+            taipei: "https://lin.ee/uguGm1qJ",
+            taoyuan: "https://lin.ee/XJmP28m",
+            hsinchu: "https://lin.ee/XsRzoaXL"
+        };
+
+        let currentQuestionIndex = 0;
+        let scoreCounter = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
+
+        function handleLogoError() {
+            document.getElementById('logo-badge-container').style.display = 'none';
+            document.getElementById('logo-fallback').classList.remove('hidden');
+            document.getElementById('logo-fallback').classList.add('flex');
+        }
+
+        function startQuiz() {
+            document.getElementById('intro-screen').classList.remove('show-page');
+            document.getElementById('intro-screen').classList.add('hide-page');
+            
+            document.getElementById('quiz-screen').classList.remove('hide-page');
+            document.getElementById('quiz-screen').classList.add('show-page');
+            
+            currentQuestionIndex = 0;
+            scoreCounter = { 'A': 0, 'B': 0, 'C': 0, 'D': 0, 'E': 0 };
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
+            
+            // Update 3D Camera Focus dynamically based on actual questions (1-5)
+            update3DSceneForQuestion(currentQuestionIndex + 1);
+
+            // Update UI elements
+            document.getElementById('quiz-step-text').innerText = `QUESTION 0${currentQuestionIndex + 1}`;
+            document.getElementById('quiz-progress-text').innerText = `${currentQuestionIndex + 1} / 5`;
+            
+            const progressPercent = ((currentQuestionIndex + 1) / 5) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+            
+            document.getElementById('question-text').innerText = currentQuestion.question;
+            
+            // Set text for options
+            document.getElementById('opt-text-A').innerText = currentQuestion.options.A.text;
+            document.getElementById('opt-text-B').innerText = currentQuestion.options.B.text;
+            document.getElementById('opt-text-C').innerText = currentQuestion.options.C.text;
+            document.getElementById('opt-text-D').innerText = currentQuestion.options.D.text;
+            document.getElementById('opt-text-E').innerText = currentQuestion.options.E.text;
+        }
+
+        function selectOption(optKey) {
+            const currentQuestion = quizData[currentQuestionIndex];
+            const chosenStyle = currentQuestion.options[optKey].style;
+            
+            // Add score to the corresponding style
+            scoreCounter[chosenStyle]++;
+
+            // Smooth fade out & in logic for questions
+            const quizContainer = document.getElementById('quiz-screen');
+            quizContainer.style.opacity = '0.3';
+            quizContainer.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    renderQuestion();
+                    quizContainer.style.opacity = '1';
+                    quizContainer.style.transform = 'translateY(0)';
+                } else {
+                    showFinalResult();
+                }
+            }, 300);
+        }
+
+        function showFinalResult() {
+            // Find the style with the highest score
+            let maxScore = -1;
+            let dominantStyle = 'A'; // Default to Hotel Style
+
+            for (const [styleId, score] of Object.entries(scoreCounter)) {
+                if (score > maxScore) {
+                    maxScore = score;
+                    dominantStyle = styleId;
+                }
+            }
+
+            const metadata = styleMetadata[dominantStyle];
+
+            // Update 3D colors and camera positions
+            update3DSceneForFinalResult(dominantStyle);
+
+            // Populate Result Panel
+            document.getElementById('result-style-title').innerText = metadata.title;
+            document.getElementById('result-style-desc').innerText = metadata.desc;
+            document.getElementById('result-style-materials').innerText = metadata.materials;
+            document.getElementById('result-promo-offer').innerHTML = `<i class="fa-solid fa-gift mr-2"></i> ${metadata.promo}`;
+            document.getElementById('style-code').innerText = metadata.code;
+
+            // Load case study link and title
+            const caseLink = document.getElementById('result-case-link');
+            const caseTitle = document.getElementById('result-case-title');
+            if (metadata.caseUrl && metadata.caseTitle) {
+                caseLink.href = metadata.caseUrl;
+                caseTitle.innerText = metadata.caseTitle;
+                caseLink.style.display = 'inline-flex';
+            } else {
+                caseLink.style.display = 'none';
+            }
+
+            // Load high-quality real design photo with smooth opacity transitions
+            const styleImgElement = document.getElementById('style-image');
+            styleImgElement.style.opacity = '0';
+            
+            // Try to load configured image first
+            styleImgElement.src = metadata.image;
+            styleImgElement.onload = () => {
+                styleImgElement.style.opacity = '1';
+            };
+            styleImgElement.onerror = () => {
+                // Graceful fallback to Unsplash placeholder in preview environments
+                styleImgElement.src = metadata.fallbackImage;
+                styleImgElement.onload = () => {
+                    styleImgElement.style.opacity = '1';
+                };
+            };
+
+            // Page Transition to Result View
+            document.getElementById('quiz-screen').classList.remove('show-page');
+            document.getElementById('quiz-screen').classList.add('hide-page');
+            
+            document.getElementById('result-screen').classList.remove('hide-page');
+            document.getElementById('result-screen').classList.add('show-page');
+        }
+
+        function restartQuiz() {
+            document.getElementById('result-screen').classList.remove('show-page');
+            document.getElementById('result-screen').classList.add('hide-page');
+            
+            document.getElementById('intro-screen').classList.remove('hide-page');
+            document.getElementById('intro-screen').classList.add('show-page');
+
+            // Reset camera to cinematic initial view
+            targetCameraPos = { x: 0, y: 3, z: 12 };
+            targetLookAt = { x: 0, y: 1, z: 0 };
+            lightSpot.color.setHex(0x3b82f6);
+            lightSpot.intensity = 3;
+        }
+
+        function copyStyleCode() {
+            const codeText = document.getElementById('style-code').innerText;
+            
+            // Frame safe fallback copy method
+            const tempInput = document.createElement("input");
+            tempInput.value = codeText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Play elegant feedback toast animation
+            const toast = document.getElementById('toast-message');
+            const toastSpan = toast.querySelector('span');
+            toastSpan.innerText = "優惠代碼已成功複製！";
+            const copyIcon = document.getElementById('copy-icon');
+            
+            copyIcon.className = "fa-solid fa-check text-brandBlue-600";
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(-10px) translateX(-50%)';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(0) translateX(-50%)';
+                copyIcon.className = "fa-regular fa-copy";
+            }, 3000);
+        }
+
+        // Redirect to HouseStyle Official LINE with prefilled text template & automated branch routing
+        function handleLineRedirect(branchKey) {
+            const url = LINE_LINKS[branchKey];
+            const codeText = document.getElementById('style-code').innerText;
+            const styleTitle = document.getElementById('result-style-title').innerText;
+            
+            const branchNames = {
+                taipei: "台北門市",
+                taoyuan: "桃園門市",
+                hsinchu: "新竹門市"
+            };
+            const branchName = branchNames[branchKey] || "好時代門市";
+
+            // Construct booking message copy template
+            const message = `您好！我剛剛完成了好時代衛浴的「衛浴美學避難所」心理測驗，測出我最契合的專屬風格是：【${styleTitle}】！\n\n專屬優惠代碼：${codeText}\n\n我想指名預約【${branchName}】進行免費的門市諮詢與到府丈量，進一步規劃我的風格空間與乾濕分離配置！`;
+            
+            const tempInput = document.createElement("textarea");
+            tempInput.value = message;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Toast feedback
+            const toast = document.getElementById('toast-message');
+            const toastSpan = toast.querySelector('span');
+            toastSpan.innerText = `已為您複製 ${branchName} 預約資訊！轉導後直接「貼上」即可。`;
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(-10px) translateX(-50%)';
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(0) translateX(-50%)';
+                window.open(url, '_blank');
+            }, 1500);
+        }
+
+        let scene, camera, renderer, lightSpot, ambientLight;
+        let objects = {};
+        let targetCameraPos = { x: 0, y: 3, z: 12 };
+        let targetLookAt = { x: 0, y: 1, z: 0 };
+        let currentLookAt = null;
+
+        function init3D() {
+            const container = document.getElementById('webgl-container');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // Instantiate Vector3 inside safely
+            currentLookAt = new THREE.Vector3(0, 1, 0);
+
+            // Create Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f7ff);
+            scene.fog = new THREE.FogExp2(0xf0f7ff, 0.05);
+
+            // Create Camera
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+            camera.position.set(targetCameraPos.x, targetCameraPos.y, targetCameraPos.z);
+
+            // Create Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            container.appendChild(renderer.domElement);
+
+            // Create Ambient Light
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+            scene.add(ambientLight);
+
+            // Create Spot Light for product highlighting
+            lightSpot = new THREE.SpotLight(0x3b82f6, 3, 20, Math.PI / 4, 0.5, 1);
+            lightSpot.position.set(0, 6, 2);
+            lightSpot.castShadow = true;
+            scene.add(lightSpot);
+
+            // Build conceptual modern bathroom showroom setup
+            buildShowroom();
+
+            // Handle Resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Start animation loop
+            animate();
+        }
+
+        function buildShowroom() {
+            const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+            const chromeMaterial = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.9, roughness: 0.1 });
+            const woodMaterial = new THREE.MeshStandardMaterial({ color: 0xcdb4db, roughness: 0.7 });
+            const glassMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xe0effe, 
+                transparent: true, 
+                opacity: 0.3, 
+                roughness: 0.1,
+                transmission: 0.9,
+                thickness: 0.5
+            });
+
+            // 1. Backwall
+            const wallGeo = new THREE.BoxGeometry(10, 5, 0.2);
+            const wallMesh = new THREE.Mesh(wallGeo, wallMaterial);
+            wallMesh.position.set(0, 2, -2);
+            wallMesh.receiveShadow = true;
+            scene.add(wallMesh);
+
+            // 2. Tiled floor
+            const floorGeo = new THREE.PlaneGeometry(20, 20);
+            const floorMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.3 });
+            const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+            floorMesh.rotation.x = -Math.PI / 2;
+            floorMesh.receiveShadow = true;
+            scene.add(floorMesh);
+
+            // 3. Luxurious floating Vanity cabinet
+            const vanityCabinetGeo = new THREE.BoxGeometry(3, 0.6, 1.2);
+            const vanityMesh = new THREE.Mesh(vanityCabinetGeo, woodMaterial);
+            vanityMesh.position.set(-2, 1, -1.2);
+            vanityMesh.castShadow = true;
+            scene.add(vanityMesh);
+            objects.vanity = vanityMesh;
+
+            // 4. Mirror over Vanity
+            const mirrorGeo = new THREE.CylinderGeometry(0.8, 0.8, 0.05, 32);
+            const mirrorMesh = new THREE.Mesh(mirrorGeo, chromeMaterial);
+            mirrorMesh.rotation.x = Math.PI / 2;
+            mirrorMesh.position.set(-2, 2.2, -1.85);
+            scene.add(mirrorMesh);
+            objects.mirror = mirrorMesh;
+
+            // 5. Minimalist Oval Bathtub
+            const tubGroup = new THREE.Group();
+            const tubOuterGeo = new THREE.CylinderGeometry(1.2, 1.0, 1.0, 32);
+            const tubOuterMesh = new THREE.Mesh(tubOuterGeo, new THREE.MeshStandardMaterial({ color: 0xfcfdfe, roughness: 0.2 }));
+            tubOuterMesh.castShadow = true;
+            tubGroup.add(tubOuterMesh);
+            
+            tubGroup.position.set(2, 0.5, -0.5);
+            scene.add(tubGroup);
+            objects.tub = tubGroup;
+
+            // 6. Premium Minimalist Glass Partition
+            const glassFrameGeo = new THREE.BoxGeometry(0.1, 4, 1.8);
+            const glassPanel = new THREE.Mesh(glassFrameGeo, glassMaterial);
+            glassPanel.position.set(0.1, 2, -0.8);
+            scene.add(glassPanel);
+            objects.glassPanel = glassPanel;
+        }
+
+        function update3DSceneForQuestion(questionIndex) {
+            switch(questionIndex) {
+                case 1: // Q1: overview
+                    targetCameraPos = { x: 0, y: 3.2, z: 10 };
+                    targetLookAt = { x: 0, y: 1.0, z: -1 };
+                    lightSpot.color.setHex(0x3b82f6);
+                    lightSpot.intensity = 3;
+                    break;
+                case 2: // Q2: zoom mirror
+                    targetCameraPos = { x: -2.5, y: 2.0, z: 5 };
+                    targetLookAt = { x: -2, y: 1.8, z: -1.5 };
+                    lightSpot.color.setHex(0x2563eb);
+                    lightSpot.intensity = 3.5;
+                    break;
+                case 3: // Q3: zoom cabinet
+                    targetCameraPos = { x: -1.5, y: 0.8, z: 4.5 };
+                    targetLookAt = { x: -2, y: 0.5, z: -1.2 };
+                    lightSpot.color.setHex(0x1d4ed8);
+                    lightSpot.intensity = 4;
+                    break;
+                case 4: // Q4: tub direction
+                    targetCameraPos = { x: 1, y: 2.0, z: 6 };
+                    targetLookAt = { x: 1.5, y: 1.2, z: -1 };
+                    lightSpot.color.setHex(0x60a5fa);
+                    lightSpot.intensity = 3.2;
+                    break;
+                case 5: // Q5: broad panorama
+                    targetCameraPos = { x: 0, y: 3.5, z: 11 };
+                    targetLookAt = { x: 0, y: 1.2, z: -0.5 };
+                    lightSpot.color.setHex(0x38bdf8);
+                    lightSpot.intensity = 3;
+                    break;
+                default:
+                    targetCameraPos = { x: 0, y: 3, z: 12 };
+                    targetLookAt = { x: 0, y: 1, z: 0 };
+                    break;
+            }
+        }
+
+        function update3DSceneForFinalResult(styleId) {
+            targetCameraPos = { x: 0, y: 2.2, z: 7.5 };
+            targetLookAt = { x: 0, y: 1.2, z: -1.5 };
+            
+            switch(styleId) {
+                case 'A': // Hotel Elegant -> Luxurious Warm Gold White
+                    lightSpot.color.setHex(0xfcd34d);
+                    ambientLight.color.setHex(0xfffbeb);
+                    lightSpot.intensity = 4;
+                    break;
+                case 'B': // Nordic Natural -> Clean daylight green-blue tone
+                    lightSpot.color.setHex(0x86efac);
+                    ambientLight.color.setHex(0xf0fdf4);
+                    lightSpot.intensity = 3.5;
+                    break;
+                case 'C': // Modern Minimalist -> Slick cool blue
+                    lightSpot.color.setHex(0x38bdf8);
+                    ambientLight.color.setHex(0xf0f9ff);
+                    lightSpot.intensity = 4.2;
+                    break;
+                case 'D': // Creamy Luxury -> Gentle warm sunset vibe
+                    lightSpot.color.setHex(0xfde047);
+                    ambientLight.color.setHex(0xfefce8);
+                    lightSpot.intensity = 3.8;
+                    break;
+                case 'E': // Zen Muji -> Gentle cozy organic timber glow
+                    lightSpot.color.setHex(0xfed7aa);
+                    ambientLight.color.setHex(0xfffaf0);
+                    lightSpot.intensity = 3.2;
+                    break;
+            }
+        }
+
+        function onWindowResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (camera && currentLookAt) {
+                // Interpolate camera position smoothly
+                camera.position.x += (targetCameraPos.x - camera.position.x) * 0.05;
+                camera.position.y += (targetCameraPos.y - camera.position.y) * 0.05;
+                camera.position.z += (targetCameraPos.z - camera.position.z) * 0.05;
+
+                // Interpolate camera target vector (LookAt)
+                currentLookAt.x += (targetLookAt.x - currentLookAt.x) * 0.05;
+                currentLookAt.y += (targetLookAt.y - currentLookAt.y) * 0.05;
+                currentLookAt.z += (targetLookAt.z - currentLookAt.z) * 0.05;
+                camera.lookAt(currentLookAt);
+            }
+
+            // Subtle rotation of showroom elements
+            if(objects.mirror) {
+                objects.mirror.rotation.y += 0.002;
+            }
+            if(objects.tub) {
+                objects.tub.rotation.y += 0.001;
+            }
+
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+
+        // Initialize 3D on window load
+        window.onload = function() {
+            init3D();
+        };
     </script>
-</head>
-<body style="font-family: sans-serif; text-align: center; padding-top: 50px;">
-    <p>正在隨機為您跳轉至表單，請稍候...</p>
 </body>
 </html>
